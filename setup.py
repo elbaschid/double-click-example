@@ -33,7 +33,7 @@ setup(
     packages=find_packages(),
     install_requires=requires,
     entry_points={'console_scripts': [
-        'forecast = forecast.cli:main']},
+        'weather = forecast.cli:main']},
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: MIT License',

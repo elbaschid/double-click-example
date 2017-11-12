@@ -51,6 +51,27 @@ def config(ctx):
 
 @main.command()
 @click.pass_context
-def today(ctx):
+@click.argument('location')
+def today(ctx, location):
     api_key = ctx.obj.api_key
-    print(f'Your API key is: {api_key}')
+
+    url = 'https://api.openweathermap.org/data/2.5/weather'
+
+    params = {
+        'APPID': api_key,
+        'q': location,
+        'units': 'metric',
+    }
+
+    response = session.get(url, params=params)
+
+    data = response.json()
+
+    name = data.get('name', location)
+    description = data['weather'][0]['description']
+
+    temp_min = data['main']['temp_min']
+    temp_max = data['main']['temp_max']
+
+    click.secho(f'Weather for {name}: {description.capitalize()}')
+    click.secho(f'Temperature (C): {temp_min} to {temp_max}')
