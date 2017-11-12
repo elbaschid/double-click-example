@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 requires = ['click']
-tests_require = ['pytest', 'pytest-cache', 'pytest-cov']
+tests_require = ['pytest', 'pytest-cache', 'pytest-cov', 'mock']
 
 
 class PyTest(TestCommand):
