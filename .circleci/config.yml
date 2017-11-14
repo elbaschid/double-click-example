@@ -16,23 +16,28 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "requirements.txt" }}
+          - v1-dependencies-{{ checksum "setup.py" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
       - run:
           name: install dependencies
           command: |
-            pip install -e .
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -e ".[test]"
             pip install flake8
 
       - save_cache:
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - "./venv"
+          key: v1-dependencies-{{ checksum "setup.py" }}
         
       # run tests!
       - run:
           name: run tests
           command: |
+            . venv/bin/activate
             python setup.py test
             flake8 forecast
 

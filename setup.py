@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 requires = ['click', 'requests', 'python-dateutil']
-tests_require = ['pytest', 'pytest-cache', 'pytest-cov', 'mock']
+tests_require = ['pytest', 'pytest-cache', 'pytest-cov', 'flake8']
 
 
 class PyTest(TestCommand):

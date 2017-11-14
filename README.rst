@@ -1,9 +1,8 @@
 pycon-double-click
 #############################
 
-
-.. image:: https://travis-ci.org/elbaschid/pycon-double-click.svg?branch=master
-   :target: https://travis-ci.org/elbaschid/pycon-double-click
+.. image:: https://circleci.com/gh/elbaschid/double-click-example.svg?style=svg
+    :target: https://circleci.com/gh/elbaschid/double-click-example
 
 
 License
