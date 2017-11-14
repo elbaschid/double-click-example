@@ -3,8 +3,8 @@ import click
 
 from click.testing import CliRunner
 
-from forecast.cli import validate_api_key
-from forecast.cli import main
+from forecast.simple import validate_api_key
+from forecast.simple import main
 
 
 @pytest.mark.parametrize('value', [None, 12])

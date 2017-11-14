@@ -4,7 +4,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-requires = ['click']
+requires = ['click', 'requests', 'python-dateutil']
 tests_require = ['pytest', 'pytest-cache', 'pytest-cov', 'mock']
 
 
@@ -33,7 +33,9 @@ setup(
     packages=find_packages(),
     install_requires=requires,
     entry_points={'console_scripts': [
-        'weather = forecast.cli:main']},
+        'weather-simple = forecast.simple:main',
+        'weather-pipeline = forecast.pipeline:main',
+    ]},
     classifiers=[
         'Development Status :: 1 - Planning',
         'License :: OSI Approved :: MIT License',

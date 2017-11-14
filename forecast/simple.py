@@ -1,11 +1,16 @@
 import os
 import re
 import click
+import requests
 
+from dateutil.parser import parse
 from collections import namedtuple
-from configparser import ConfigParser
+
+from .parameters import LOCATION
 
 Config = namedtuple('Config', ['config_file', 'api_key'])
+
+session = requests.Session()
 
 
 def validate_api_key(value):
@@ -36,10 +41,10 @@ def main(ctx, config_file, api_key):
 
 
 @main.command()
-@click.pass_context
-def config(ctx):
-    config_file = ctx.obj.config_file
-    api_key = ctx.obj.api_key
+@click.pass_obj
+def config(obj):
+    config_file = obj.config_file
+    api_key = obj.api_key
 
     api_key = click.prompt('Please enter your API key', default=api_key)
 
@@ -49,17 +54,38 @@ def config(ctx):
         cfg.write(api_key)
 
 
+@main.command('find')
+@click.pass_obj
+@click.argument('location', type=LOCATION)
+def find_city_id(obj, location):
+    api_key = obj.api_key
+
+    if location.type is 'id':
+        click.echo(f"City ID: {location.value}")
+        return
+
+    url = 'https://api.openweathermap.org/data/2.5/find'
+    params = {
+        'APPID': api_key,
+        'q': location.value,
+    }
+
+    response = session.get(url, params=params)
+    data = response.json()
+    click.echo(f"City ID: {data['list'][0]['id']}")
+
+
 @main.command()
-@click.pass_context
-@click.argument('location')
-def today(ctx, location):
-    api_key = ctx.obj.api_key
+@click.pass_obj
+@click.argument('location', type=LOCATION)
+def today(obj, location):
+    api_key = obj.api_key
 
     url = 'https://api.openweathermap.org/data/2.5/weather'
 
     params = {
         'APPID': api_key,
-        'q': location,
+        location.query: location.value,
         'units': 'metric',
     }
 
@@ -67,7 +93,7 @@ def today(ctx, location):
 
     data = response.json()
 
-    name = data.get('name', location)
+    name = data.get('name', location.value)
     description = data['weather'][0]['description']
 
     temp_min = data['main']['temp_min']
@@ -75,3 +101,43 @@ def today(ctx, location):
 
     click.secho(f'Weather for {name}: {description.capitalize()}')
     click.secho(f'Temperature (C): {temp_min} to {temp_max}')
+
+
+@main.command()
+@click.pass_obj
+@click.argument('location', type=LOCATION)
+def forecast(obj, location):
+    api_key = obj.api_key
+
+    url = 'https://api.openweathermap.org/data/2.5/forecast'
+
+    params = {
+        'APPID': api_key,
+        location.query: location.value,
+        'units': 'metric',
+    }
+
+    response = session.get(url, params=params)
+
+    data = response.json()
+
+    time = 'Time'
+    description = 'Description'
+    temp_min = 'Min Temp'
+    temp_max = 'Max Temp'
+
+    click.echo('')
+    click.echo(f'{time:^20}{description:^20}{temp_min:>10}{temp_max:>10}')
+    click.echo('=' * 60)
+
+    for data in data['list']:
+        time = parse(data['dt_txt']).strftime('%a, %b %d @ %Hh')
+
+        description = data['weather'][0]['description']
+
+        temp_min = data['main']['temp_min']
+        temp_max = data['main']['temp_max']
+
+        click.echo(
+            f'{time:<20}{description:^20}{temp_min:>10.1f}{temp_max:>10.1f}'
+        )
